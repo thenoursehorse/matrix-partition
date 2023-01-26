@@ -1,57 +1,49 @@
+
+import argparse
 import numpy as np
 import scipy
 import scipy.linalg
-from autopartition import AutoPartition
-from operators import *
-
 import matplotlib.pyplot as plt
 
-def ising_chain(N=5, g=0, alpha=np.inf):
-    # Set the energy scale
-    J = 1
+from autopartition import AutoPartition
+from operators import *
+from hamiltonians import ising_chain
 
-    # construct the hamiltonian
-    H = 0
 
-    # magnetic field
-    for i in range(N):
-        H -= g * sigma_chain(N, 'x', i)
+if __name__ == '__main__':
+    print("Ising: N chain length, g tranvserse field. alpha power law coupling.")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-N', type=int, default=5)
+    parser.add_argument('-g', type=float, default=1)
+    parser.add_argument('-alpha', type=float, default=10000)
+    parser.add_argument('-time', type=float, default=1)
+    parser.add_argument('-with-qutip', type=int, default=0)
+    parser.add_argument('-print', type=int, default=1)
+    args = parser.parse_args()
+    if args.alpha > 1e3:
+        args.alpha = np.inf
+    print(args)
 
-    # interaction terms
-    if alpha == np.inf:
-        for i in range(N):
-            H += J * sigma_chain(N, 'z', i, 'z', (i+1)%N)
-
+    # Define Hamiltonian
+    N = args.N
+    if args.with_qutip > 0:
+        H = ising_chain(N=args.N, g=args.g, alpha=args.alpha).data.todense()
     else:
-        for i in range(N):
-            for j in range(N):
-                if i > j:
-                    coupling = J / np.power( np.abs(i-j), alpha)
-                    H += coupling * sigma_chain(N, 'z', i, 'z', j)
-    return H
+        H = ising_chain(N=args.N, g=args.g, alpha=args.alpha)
 
-# Chain length
-N = 4
+    # Obtain unitary at time t
+    t = np.pi/4.
+    U = scipy.linalg.expm(-1j*H*args.time)
 
-# Define Hamiltonian
-g = 1
-alpha = 1.51 #np.inf #1.51
-H = ising_chain(N=N, g=g, alpha=alpha)
+    print()
+    print("Partitioning in computational basis:")
 
-# Obtain unitary at time t
-t = np.pi/4.
-U = scipy.linalg.expm(-1j*H*t)
+    ising = AutoPartition(U)
 
-# Symmetry labels
-sigmaz = sigma_sum(N=N, axis='z')
-Op_dict = {'sigmaz': sigmaz}
-
-print("Partitioning in computational basis:")
-ising = AutoPartition(U, symmetry_operators=Op_dict)
-
-# Weight plot of matrix elements in block-diagonal permutation
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-ising.plot(ax=ax)
-ax.set_xlabel('States')
-ax.set_ylabel('States')
-plt.show()
+    if args.print > 0:
+        # Weight plot of matrix elements in block-diagonal permutation
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+        ising.plot(ax=ax)
+        ax.set_xlabel('States')
+        ax.set_ylabel('States')
+        plt.show()

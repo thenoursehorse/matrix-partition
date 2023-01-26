@@ -85,9 +85,6 @@ def S2_to_S(S2):
     return 0.5*(-1 + np.sqrt(1 + 4*S2))
 
 def permute_ij(N, i, j):
-    # indexed from zero, but my equations are 1->N
-    i -= 1
-    j -= 1
     axes = ['x','y','z']
     P = 0
     for mu, axis in enumerate(axes):
@@ -96,15 +93,17 @@ def permute_ij(N, i, j):
     return P / 2.0
 
 def parity(N):
-    Op = permute_ij(N, 1, N)
+    Op = permute_ij(N, 0, N-1)
     
     # Even
     if N%2 == 0:
         for i in range(1, int(N/2) ):
-            Op = Op @ permute_ij(N, i, N-i)
+            j = N-i-1
+            Op = Op @ permute_ij(N, i, j)
     # Odd
     else:
         for i in range(1, int( (N-1)/2) ):
-            Op = Op @ permute_ij(N, i, N-i)
+            j = N-i-1
+            Op = Op @ permute_ij(N, i, j)
     
     return Op
