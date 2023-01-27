@@ -1,8 +1,23 @@
+# Copyright (c) 2023 H. L. Nourse
+#
+# This file is part of matrix-partition.
+#
+# matrix-partition is free software: you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by the Free 
+# Software Foundation, with version 3 of the License.
+#
+# matrix-partition is distributed in the hope that it will be useful, but 
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with 
+# matrix-partition. If not, see <https://www.gnu.org/licenses/>. 
+
 import numpy as np
-import scipy
 
 from copy import deepcopy
-from itertools import compress
+import itertools
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -17,11 +32,12 @@ def apply_mask(l, mask):
     if isinstance(l, np.ndarray):
         return l[mask]
     elif isinstance(l, list):
-        return list(compress(l, mask))
+        return list(itertools.compress(l, mask))
     else:
         raise ValueError("Must apply mask to a list or numpy array !")
 
 # Exactly copy pasted from https://stackoverflow.com/a/4843408
+# NOTE the below function is not under GPL-3.0
 def merge_lists_jochen(l):
     import networkx 
     from networkx.algorithms.components.connected import connected_components
@@ -51,7 +67,7 @@ def merge_lists_jochen(l):
     return list(connected_components(G))
 
 # Exactly copy pasted from https://stackoverflow.com/a/4842897
-# Basically the same as the algorithm I did in C
+# NOTE the below function is not under GPL-3.0
 def merge_lists_howard(l):
   out = []
   while len(l)>0:
@@ -246,7 +262,7 @@ def get_symmetry_labels(H, Op_dict, symmetry_sectors):
                 if np.var(temp) > 1e-12:
                     # HACK it is safer to check that the application of Op does
                     # not connect to another symmetry sector, but whatever
-                    print(f"Op index {j} is not a quantum number in this basis !")
+                    print(f"{key} index {j} is not a quantum number in this basis !")
                     quantum_numbers[s][key] = np.inf
                 else:
                     quantum_numbers[s][key] = np.round(temp[0], decimals=2)
@@ -275,6 +291,7 @@ def print_labels(labels):
             line += f'{val:<10}'
         print(line)
 
+# NOTE the below function is not under GPL-3.0
 def plot_hinton(matrix, max_weight=None, ax=None, cmap=None):
     """
     Draw Hinton diagram for visualizing a weight matrix.
@@ -329,101 +346,3 @@ def plot_hinton(matrix, max_weight=None, ax=None, cmap=None):
     
     ax.autoscale_view()
     ax.invert_yaxis()
-
-class AutoPartition(object):
-    def __init__(self, M, symmetry_operators=None):
-        self._M = M
-        self._symmetry_operators = symmetry_operators
-
-        self.run()
-    
-    def run(self):
-        if self._symmetry_operators is not None:
-                self.check_commutations()
-        self.set_connections()
-        self.set_sectors()
-        self.set_labels()
-        self.set_permutation()
-        self._Ms = self.get_submatrices()
-        self._M = scipy.linalg.block_diag(*self._Ms)
-
-    def check_commutations(self):
-        truth_list = commutator_list(self._symmetry_operators, self._M)
-        for key,val in truth_list.items():
-            print(f'[H,{key}] = 0 is {val}')
-
-    def set_connections(self):
-        self._connections = get_connections(self._M, tol=1e-12, weight_fnc=None)
-
-    def set_sectors(self):
-        self._sectors = get_symmetry_sectors(self._connections)
-        self._num_sectors = len(self._sectors)
-
-    def set_labels(self, symmetry_operators=None):
-        if symmetry_operators is None:
-            symmetry_operators = self._symmetry_operators
-        self._labels = get_symmetry_labels(self._M, symmetry_operators, self._sectors)
-        self.print_labels()
-
-    def print_labels(self):
-        print_labels(self._labels)
-
-    def set_permutation(self):
-        self._P = get_permutation(self._sectors)
-
-    def permute_M(self, M, P):
-        return permute_Op(M, P)
-
-    def get_submatrices(self, M=None):
-        if M is None:
-            M = self._M
-        Ms = []
-        for s in range(self._num_sectors):
-            Ms.append( self.permute_M(M, self._sectors[s]) )
-        return Ms
-
-    def rotate_sectors(self, rotation):
-        out = deepcopy(self._Ms)
-        for s in range(self._num_sectors):
-            out[s] = rotate_operator(self._Ms[s], rotation[s])
-        return out
-
-    def plot(self, M=None, ax=None, cmap=None, style='hinton'):
-        if M is None:
-            M = self._M
-        if style == 'hinton':
-            plot_hinton(M, ax=ax, cmap=cmap)
-        else:
-            raise ValueError("Only hinton plots implemented !")
-
-    @property
-    def M(self):
-        return self._M
-
-    @property
-    def submatrices(self):
-        return self._Ms
-
-    @property
-    def submatrix(self, s):
-        return self._Ms[s]
-
-    @property
-    def connections(self):
-        return self._connections
-
-    @property
-    def sectors(self):
-        return self._sectors
-
-    @property
-    def num_sectors(self):
-        return self._num_sectors
-
-    @property
-    def labels(self):
-        return self._labels
-
-    @property
-    def P(self):
-        return self._P

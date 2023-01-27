@@ -5,9 +5,9 @@ import scipy
 import scipy.linalg
 import matplotlib.pyplot as plt
 
-from autopartition import AutoPartition
+from src.autopartition import AutoPartition
 from operators import *
-from hamiltonians import ising_chain
+from hamiltonians import ising_chain, qutip_ising_chain
 
 
 if __name__ == '__main__':
@@ -18,16 +18,19 @@ if __name__ == '__main__':
     parser.add_argument('-alpha', type=float, default=10000)
     parser.add_argument('-time', type=float, default=1)
     parser.add_argument('-with-qutip', type=int, default=0)
-    parser.add_argument('-print', type=int, default=1)
+    parser.add_argument('-plot', type=int, default=1)
     args = parser.parse_args()
     if args.alpha > 1e3:
         args.alpha = np.inf
     print(args)
+    
+    if args.plot > 0:
+        fig, ax = plt.subplots(2, 1, figsize=(5, 10))
 
     # Define Hamiltonian
     N = args.N
     if args.with_qutip > 0:
-        H = ising_chain(N=args.N, g=args.g, alpha=args.alpha).data.todense()
+        H = qutip_ising_chain(N=args.N, g=args.g, alpha=args.alpha).data.todense()
     else:
         H = ising_chain(N=args.N, g=args.g, alpha=args.alpha)
 
@@ -37,13 +40,27 @@ if __name__ == '__main__':
 
     print()
     print("Partitioning in computational basis:")
-
     ising = AutoPartition(U)
+    ising.set_labels()
+    ising.print_labels()
+    
+    if args.plot > 0:
+        ising.plot(ax=ax[0])
+        ax[0].set_ylabel('States')
+        ax[0].set_xlabel('States')
 
-    if args.print > 0:
-        # Weight plot of matrix elements in block-diagonal permutation
-        fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-        ising.plot(ax=ax)
-        ax.set_xlabel('States')
-        ax.set_ylabel('States')
+    print()
+    print("Partitioning in parity basis:") 
+    P = parity(N)
+    symmetry_operators = {'P':P}
+    ising.apply_symmetries(symmetry_operators=symmetry_operators)
+    ising.set_labels()
+    ising.print_labels()
+
+    if args.plot > 0:
+        ising.plot(ax=ax[1])
+        ax[1].set_ylabel('States')
+        ax[1].set_xlabel('States')
+    
+    if args.plot > 0:
         plt.show()
