@@ -1,25 +1,23 @@
 [project]
-name = "matrix-partition-thenoursehorse"
-
-version = "3.0.0"  # Required
-
+name = "matrix-partition"
+version = "0.0.1"
 description = "Automatically partition a matrix into a block diagonal form with respect to symmetries."
-
 readme = "README.md"
-
 requires-python = ">=3.7"
-
 license = {file = "LICENSE"}
-
-keywords = ["quantum", "symmetry", "automatic", "partition"]  # Optional
-
+keywords = ["quantum", "symmetry", "automatic", "partition"]
 authors = [
   {name = "H. L. Nourse"}
 ]
-
-dependencies = [ # Optional
+dependencies = [
   "numpy",
   "scipy"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
 ]
 
 [project.urls]
@@ -28,7 +26,5 @@ dependencies = [ # Optional
 [tool.setuptools]
 
 [build-system]
-# These are the assumed default build requirements from pip:
-# https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
-requires = ["setuptools>=43.0.0", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"

@@ -1,18 +1,23 @@
-
 import argparse
+import textwrap
 import numpy as np
 import scipy
 import scipy.linalg
 import matplotlib.pyplot as plt
 
-from src.autopartition import AutoPartition
+from matrix_partition.autopartition import AutoPartition
 from operators import *
 from hamiltonians import ising_chain, qutip_ising_chain
 
-
 if __name__ == '__main__':
-    print("Ising: N chain length, g tranvserse field. alpha power law coupling.")
-    parser = argparse.ArgumentParser()
+    description = textwrap.dedent('''\
+         Ising chain:
+             N     : number of sites
+             g     : transverse field
+             alpha :  power law coupling (>1e3 -> nearest-neighbour)
+         ''')
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description=description)
     parser.add_argument('-N', type=int, default=5)
     parser.add_argument('-g', type=float, default=1)
     parser.add_argument('-alpha', type=float, default=10000)
@@ -22,7 +27,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.alpha > 1e3:
         args.alpha = np.inf
-    print(args)
+    print(vars(args))
     
     if args.plot > 0:
         fig, ax = plt.subplots(2, 1, figsize=(5, 10))

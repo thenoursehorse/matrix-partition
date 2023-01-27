@@ -1,16 +1,36 @@
 import argparse
+import textwrap
 import numpy as np
 import scipy
 import scipy.linalg
 import matplotlib.pyplot as plt
 
-from src.autopartition import AutoPartition
+from matrix_partition.autopartition import AutoPartition
 from operators import *
 from hamiltonians import xyz_chain, qutip_xyz_chain
 
 if __name__ == '__main__':
+    description = textwrap.dedent('''\
+         XXZ spin-1/2 chain:
+             N     : number of sites
+             Delta : Sz Sz coupling
+             alpha :  power law coupling (>1e3 -> nearest-neighbour)
+         ''')
+    epilog = textwrap.dedent('''\
+         Symmetries:
+             XXX periodic even number of sites: Sz, total spin (SU(2)), Parity/reflection (P), pi rotation about x (R_x), crystal momentum (C_N)
+             XXX periodic odd: Sz, SU(2), P, C_N
+             XXX open even: Sz, SU(2), P, R_x
+             XXX open odd: Sz, SU(2), P
+             XXZ periodic even: Sz, P, R_x, C_N
+             XXZ periodic odd: Sz, P, C_N
+             XXZ open even: Sz, P, R_x
+             XXZ open odd: Sz, P
+         ''')
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description=description,
+                                     epilog=epilog)
     print("XXZ: Delta ZZ coupling. alpha power law coupling.")
-    parser = argparse.ArgumentParser()
     parser.add_argument('-N', type=int, default=5)
     parser.add_argument('-Delta', type=float, default=1)
     parser.add_argument('-alpha', type=float, default=10000)
@@ -19,19 +39,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.alpha > 1e3:
         args.alpha = np.inf
-    print(args)
+    print(vars(args))
 
-    print()
-    print("Symmetries for N sites are:")
-    print("xxx periodic even: Sz, total spin (SU(2)), Parity (P), pi rotation about x (R_x), crystal momentum (C_N)")
-    print("xxx periodic odd: Sz, SU(2), P, C_N")
-    print("xxx open even: Sz, SU(2), P, R_x")
-    print("xxx open odd: Sz, SU(2), P")
-    print("xxz periodic even: Sz, P, R_x, C_N")
-    print("xxz periodic odd: Sz, P, C_N")
-    print("xxz open even: Sz, P, R_x")
-    print("xxz open odd: Sz, P")
-    
     if args.plot > 0:
         fig, ax = plt.subplots(2, 2, figsize=(10, 10))
 

@@ -20,7 +20,7 @@ import scipy
 from copy import deepcopy
 import itertools
 
-from .functions import *
+from matrix_partition.functions import *
 
 class AutoPartition(object):
     def __init__(self, M):
