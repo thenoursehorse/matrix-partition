@@ -1,18 +1,23 @@
-# Copyright (c) 2023 H. L. Nourse
-#
-# This file is part of matrix-partition.
-#
-# matrix-partition is free software: you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published by the Free 
-# Software Foundation, with version 3 of the License.
-#
-# matrix-partition is distributed in the hope that it will be useful, but 
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
-# more details.
-#
-# You should have received a copy of the GNU General Public License along with 
-# matrix-partition. If not, see <https://www.gnu.org/licenses/>. 
+'''
+Copyright (C) 2023 H. L. Nourse
+
+This file is part of matrix-partition.
+
+matrix-partition is free software: you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the Free 
+Software Foundation, with version 3 of the License.
+
+matrix-partition is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+more details.
+
+You should have received a copy of the GNU General Public License along with 
+matrix-partition. If not, see <https://www.gnu.org/licenses/>.
+
+The functions merge_lists_jochen, merge_lists_howard, and plot_hinton 
+are not under the GPL-3.0 license outlined above.
+'''
 
 import numpy as np
 
@@ -36,9 +41,11 @@ def apply_mask(l, mask):
     else:
         raise ValueError("Must apply mask to a list or numpy array !")
 
-# Exactly copy pasted from https://stackoverflow.com/a/4843408
-# NOTE the below function is not under GPL-3.0
 def merge_lists_jochen(l):
+    '''
+    Exactly copy pasted from https://stackoverflow.com/a/4843408
+    NOTE: Not under GPL-3.0 license.
+    '''
     import networkx 
     from networkx.algorithms.components.connected import connected_components
     
@@ -66,9 +73,11 @@ def merge_lists_jochen(l):
     G = to_graph(l)
     return list(connected_components(G))
 
-# Exactly copy pasted from https://stackoverflow.com/a/4842897
-# NOTE the below function is not under GPL-3.0
 def merge_lists_howard(l):
+  '''
+  Exactly copy pasted from https://stackoverflow.com/a/4842897
+  NOTE: Not under GPL-3.0 license.
+  '''
   out = []
   while len(l)>0:
       first, *rest = l
@@ -291,11 +300,11 @@ def print_labels(labels):
             line += f'{val:<10}'
         print(line)
 
-# NOTE the below function is not under GPL-3.0
 def plot_hinton(matrix, max_weight=None, ax=None, cmap=None):
     """
     Draw Hinton diagram for visualizing a weight matrix.
     Copied from https://matplotlib.org/stable/gallery/specialty_plots/hinton_demo.html
+    Not under GPL-3.0 license.
     
     Args:
         matrix : A not necessary square matrix.

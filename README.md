@@ -3,6 +3,8 @@
 Automatically partition a matrix into a block diagonal form with respect to 
 symmetries.
 
+<img src="examples/xxz_example.png" width="400" alt="xxz example">
+
 Installation
 ---------------
 
@@ -22,7 +24,7 @@ Installation
 1. Install from local
     ```
     cd matrix-partition
-    python3 -m pip install ./
+    python3 -m pip install --user ./
     ```
 
 To uninstall
@@ -36,7 +38,8 @@ Dependencies
 
 * numpy
 * scipy
-* (Optional) networkx, which makes the merge list sort faster
+* (Optional) networkx, which makes the merge list sort faster, but sorting 
+likely is not a bottleneck anyway.
 
 Usage
 -------------
@@ -64,7 +67,6 @@ Examples
 To do
 ---------------
 
-1. docstrings for member functions.
 1. The connections, sectors, and permutations need to be stored for each 
 symmetry that is applied.
 1. Implement function to rotate a state into the final permutation and basis 
