@@ -59,7 +59,8 @@ Examples
     ```
     python3 ising.py -h
     ```
-* XXZ spin-1/2 chain into SU(2), and parity sectors. For parameters and info:
+* Time evolution unitary of a XXZ spin-1/2 chain into SU(2), and parity 
+sectors. For parameters and info:
     ```
     python3 xxz.py -h
     ```
